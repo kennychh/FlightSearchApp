@@ -1,12 +1,30 @@
 
 import React, { useState, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView, StyleSheet, TabBarIOSItem, Text, TextInput, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import SwitchSelector from "react-native-switch-selector";
+import { IconoirProvider, HomeSimpleDoor, BookmarkEmpty, ProfileCircled } from 'iconoir-react-native';
+import { NavigationContainer, DefaultTheme  } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { HomeScreen } from "./screens/HomeScreen.js";
 
 SplashScreen.preventAutoHideAsync();
+
+const Tab = createBottomTabNavigator();
+
+const homeName = 'Home'
+const savedName = 'Saved'
+const profileName = 'Profile'
+
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    // background: 'white',
+    border: '#F3F3F3'
+  },
+};
 
 export default function App() {
   const [originText, onChangeOriginText] = React.useState(null);
@@ -20,9 +38,12 @@ export default function App() {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+    if (isRoundTrip) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, isRoundTrip]);
 
-  const [roundTripState, setRoundTripState] = useState(true);
+  const [isRoundTrip, setIsRoundTrip] = useState(true);
 
 
   if (!fontsLoaded) {
@@ -31,91 +52,63 @@ export default function App() {
 
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
-      <Text style={styles.title}>Flights</Text>
-      <View style={styles.box}>
-        <SwitchSelector
-          initial={0}
-          onPress={() => { setRoundTripState(!roundTripState) }}
-          textColor={'black'} //'#7a44cf'
-          selectedColor={'white'}
-          buttonColor={'black'}
-          hasPadding
-          height={40}
-          options={[
-            { label: "Round Trip", value: true, },
-            { label: "One Way", value: false, }
-          ]}
-          backgroundColor={'#E4E4E4'}
-          borderWidth={0}
-          buttonMargin={4}
-          textStyle={{ fontFamily: 'Poppins-Medium', }}
-          selectedTextStyle={{ fontFamily: 'Poppins-Medium', }}
-          testID="trip-switch-selector"
-          accessibilityLabel="trip-switch-selector"
-          style={styles.switcher}
-        />
-        <SafeAreaView>
-          <TextInput
-            style={[styles.input, styles.firstInput]}
-            onChangeText={onChangeOriginText}
-            value={originText}
-            placeholder="Where from?"
-          />
-          {roundTripState && <TextInput
-            style={styles.input}
-            onChangeText={onChangeDestinationTest}
-            value={destinationText}
-            placeholder="Where to?"
-          />}
-        </SafeAreaView>
-      </View>
+      <NavigationContainer theme={MyTheme}>
+        <Tab.Navigator
+          initialRouteName={homeName}
+          screenOptions={({ route }) => ({
+            tabBarShowLabel: false,
+            headerShown: false,
+            tabBarItemStyle: {
+              paddingTop: 16,
+            },
+            tabBarStyle: {position: 'absolute', height: 84, backgroundColor: '#F3F3F3'},
+            tabBarIcon: ({ color, size }) => {
+              let rn = route.name
+              let icon
+
+              if (rn === homeName) {
+                icon = <HomeSimpleDoor color={color} width={size} height={size} strokeWidth={2} style={{marginLeft: 48}}/>
+              }
+              else if (rn === savedName) {
+                icon = <BookmarkEmpty color={color} width={size} height={size} strokeWidth={2} />
+              }
+              else if (rn === profileName) {
+                icon = <ProfileCircled color={color} width={size} height={size} strokeWidth={2} style={{marginRight: 48}}/>
+              }
+              return icon
+            }
+          })}
+          tabBarOptions={{
+            activeTintColor: 'black',
+            inactiveTintColor: '#A6A4A8',
+            style: { height: 24},
+          }}
+        >
+          <Tab.Screen name={homeName} component={HomeScreen} />
+          <Tab.Screen name={savedName} component={HomeScreen} />
+          <Tab.Screen name={profileName} component={HomeScreen} />
+        </Tab.Navigator>
+      </NavigationContainer>
       <StatusBar style="auto" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontFamily: 'Poppins-SemiBold',
-    fontSize: 32,
-    fontWeight: '700',
-    alignSelf: 'flex-start',
-    paddingBottom: 32,
-    paddingTop: 124,
-  },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-  switcher: {
-    paddingHorizontal: 24,
-    paddingTop: 24,
-  },
-  input: {
-    height: 60,
-    marginHorizontal: 24,
-    marginTop: 12,
-    borderWidth: 2,
-    borderColor: '#EBEBEB',
-    borderRadius: 16,
-    padding: 16,
-    fontFamily: 'Poppins-Medium',
-    fontSize: 16
-  },
-  firstInput: {
-    marginTop: 24,
-  },
-  box: {
-    height: 410,
-    alignSelf: 'stretch',
     backgroundColor: 'white',
-    borderRadius: 40,
+    marginTop: 0,
+  },
+  navBar: {
+    marginTop: 'auto',
+    height: 80,
+    alignSelf: 'stretch',
+    backgroundColor: '#F3F3F3',
     shadowOffset: {
       height: 8
     },
     shadowOpacity: 0.1,
-    shadowRadius: 25
-  }
+    shadowRadius: 25,
+  },
 });
