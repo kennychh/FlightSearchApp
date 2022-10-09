@@ -1,7 +1,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, StyleSheet, TabBarIOSItem, Text, TextInput, View } from 'react-native';
+import { StyleSheet, View, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { IconoirProvider, HomeSimpleDoor, BookmarkEmpty, ProfileCircled } from 'iconoir-react-native';
@@ -21,29 +21,28 @@ const MyTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    // background: 'white',
-    border: '#F3F3F3'
+    background: '#F2F2F5',
+    border: '#F2F2F5'
   },
 };
 
 export default function App() {
-  const [originText, onChangeOriginText] = React.useState(null);
-  const [destinationText, onChangeDestinationTest] = React.useState(null);
   const [fontsLoaded] = useFonts({
     'Poppins-Medium': require('./assets/fonts/Poppins-Medium.ttf'),
     'Poppins-SemiBold': require('./assets/fonts/Poppins-SemiBold.ttf'),
   });
 
+  const DismissKeyboard = ({ children }) => (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      {children}
+    </TouchableWithoutFeedback>
+  );
+
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();
     }
-    if (isRoundTrip) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded, isRoundTrip]);
-
-  const [isRoundTrip, setIsRoundTrip] = useState(true);
+  }, [fontsLoaded]);
 
 
   if (!fontsLoaded) {
@@ -51,6 +50,7 @@ export default function App() {
   }
 
   return (
+    <DismissKeyboard>
     <View style={styles.container} onLayout={onLayoutRootView}>
       <NavigationContainer theme={MyTheme}>
         <Tab.Navigator
@@ -61,7 +61,7 @@ export default function App() {
             tabBarItemStyle: {
               paddingTop: 16,
             },
-            tabBarStyle: {position: 'absolute', height: 84, backgroundColor: '#F3F3F3'},
+            tabBarStyle: {position: 'absolute', height: 84, backgroundColor: '#F2F2F5'},
             tabBarIcon: ({ color, size }) => {
               let rn = route.name
               let icon
@@ -91,6 +91,7 @@ export default function App() {
       </NavigationContainer>
       <StatusBar style="auto" />
     </View>
+    </DismissKeyboard>
   );
 }
 

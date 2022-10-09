@@ -8,9 +8,25 @@ import { Button } from "../components/Button.js";
 
 export const HomeScreen = () => {
   const [originText, onChangeOriginText] = React.useState(null);
-  const [destinationText, onChangeDestinationTest] = React.useState(null);
+  const [destinationText, onChangeDestinationText] = React.useState(null);
+  const [departureDate, onChangeDepartureDate] = React.useState(null);
+  const [returnDate, onChangeReturnDate] = React.useState(null);
   const [isRoundTrip, setIsRoundTrip] = useState(true);
+  const [data, setData] = useState([]);
 
+  const isButtonDisabled = !originText || !destinationText || !departureDate || (isRoundTrip && !returnDate)
+
+
+  const key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI0IiwianRpIjoiMDVhMGQxZTgxZTBiNDk2YWFjZWFjYjExNGJjMzQ0OTNkZTAwYTUwZTZiOTJhYzNiOTQyNjlmNjIwMTI0Y2NiZjJjM2Y2ODhmZGUzNDM3MzgiLCJpYXQiOjE2NjUwMjcyMjgsIm5iZiI6MTY2NTAyNzIyOCwiZXhwIjoxNjk2NTYzMjI4LCJzdWIiOiIxNDQ1NCIsInNjb3BlcyI6W119.x8SrFH2Q8slWAv1by6jvEMgCJL_Ji5qpgDiv15eV3RHTTDRwtXp9IrNNa0bD25tjSEzrqoO36yXcozRu-Px0qA'
+  const fetchFlights =  () => {
+     fetch(`https://app.goflightlabs.com/search-best-flights?access_key=${key}&adults=1&origin=YTOA&destination=FCO&departureDate=2022-10-14`)
+      .then((response) => response.json())
+      .then((json) => setData(json))
+      .catch((error) => console.error(error))
+  }
+  console.log(data)
+  console.log(isButtonDisabled)
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Flights</Text>
@@ -18,16 +34,18 @@ export const HomeScreen = () => {
         <SwitchSelector
           initial={isRoundTrip ? 0 : 1}
           onPress={() => { setIsRoundTrip(!isRoundTrip) }}
-          textColor={'black'} //'#7a44cf'
+          textColor={'black'}
           selectedColor={'white'}
           buttonColor={'black'}
+          borderWidth={0}
           hasPadding
-          height={40}
+          height={42}
           options={[
             { label: "Round Trip", value: true, },
             { label: "One Way", value: false, }
           ]}
-          borderWidth={0}
+          buttonMargin={8}
+          backgroundColor={'#F2F2F5'}
           textStyle={{ fontFamily: 'Poppins-Medium', }}
           selectedTextContainerStyle={{ color: 'white' }}
           selectedTextStyle={{ fontFamily: 'Poppins-Medium', }}
@@ -43,23 +61,25 @@ export const HomeScreen = () => {
         />
         <TextInput
           style={styles.input}
-          onChangeText={onChangeDestinationTest}
+          onChangeText={onChangeDestinationText}
           value={destinationText}
           placeholder="Where to?"
         />
         <View style={styles.datePicker}>
           <TextInput
             style={[styles.input, styles.departureInput, isRoundTrip && styles.roundTripInput]}
-            value={originText}
+            value={departureDate}
+            onChangeText={onChangeDepartureDate}
             placeholder="Departure"
           />
           {isRoundTrip && <TextInput
             style={[styles.input, styles.returnInput]}
-            value={destinationText}
+            onChangeText={onChangeReturnDate}
+            value={returnDate}
             placeholder="Return"
           />}
         </View>
-        <Button title={"Search flights"} styles={styles.buttonStyle} />
+        <Button title={"Search flights"} styles={isButtonDisabled ? styles.buttonStyle : styles.buttonStyle} onPress={() => fetchFlights()} isDisabled={isButtonDisabled}/>
       </SafeAreaView>
       <View>
         <Text style={styles.sectionTitle}>Recent Searches</Text>
@@ -91,7 +111,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontFamily: 'Poppins-SemiBold',
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '700',
     alignSelf: 'flex-start',
     paddingBottom: 24,
