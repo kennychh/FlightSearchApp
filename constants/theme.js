@@ -71,8 +71,8 @@ export const themes = {
       },
     },
     switch: {
-      buttonColor: "#2E2D33",
-      backgroundColor: "#111113",
+      buttonColor: "#3B3A40",
+      backgroundColor: "#1C1A20",
       textColor: "white",
       selectedColor: "white"
     },

@@ -67,7 +67,7 @@ export const ResultsScreen = ({ route, navigation }) => {
           }}
           textColor={theme.switch.textColor}
           selectedColor={theme.switch.selectedColor}
-          buttonColor={"#2E2D33"}
+          buttonColor={theme.switch.buttonColor}
           borderWidth={0}
           hasPadding
           height={42}
