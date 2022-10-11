@@ -87,7 +87,7 @@ export const ResultsScreen = ({ route, navigation }) => {
         />
         <View style={styles.resultContainer}/>
         <View style={styles.resultContainer}/>
-        <View style={styles.resultContainer}/>
+        <View style={[styles.resultContainer, {marginBottom: 24}]}/>
      </ScrollView>
     </View>
   );

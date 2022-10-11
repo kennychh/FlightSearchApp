@@ -28,6 +28,10 @@ export const themes = {
         color: "#EBEBEB"
       },
     },
+    displayIcon: {
+      backgroundColor: "#313135",
+      iconColor: "#757575"
+    },
     switch: {
       buttonColor: "#2E2D33",
       backgroundColor: "#111113",
@@ -46,7 +50,7 @@ export const themes = {
   },
   dark: {
     backgroundColor: "black",
-    onBackgroundColor: "#1C1A20",
+    onBackgroundColor: "#1C1C1D",
     tripContainer: '#121212',
     primary: {
       button: {
@@ -62,27 +66,33 @@ export const themes = {
     secondary: {
       button: {
         text: {
-          color: "black",
+          color: "white",
         },
-        color: "#DBDBE2",
+        color: "#313135",
+        onBackgroundColor: '#2C2C2D'
       },
       text: {
-        color: "#A6A4A8",
+        onBackgroundColor: '#8D8D92',
+        color: "#98989F",
       },
     },
+    displayIcon: {
+      backgroundColor: "#313135",
+      iconColor: "white"
+    },
     switch: {
-      buttonColor: "#3B3A40",
-      backgroundColor: "#1C1A20",
+      buttonColor: "#313135",
+      backgroundColor: "#1C1C1D",
       textColor: "white",
       selectedColor: "white"
     },
     input: {
-      color: "#434347"
+      color: "#38383A"
     },
     icon: {
       color: "white",
       inactive: {
-        color: "#565659",
+        color: "#757575",
       },
     },
   },

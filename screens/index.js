@@ -1,2 +1,3 @@
-export { default as HomeScreen } from './HomeScreen';
-export { default as ResultsScreen } from './ResultsScreen';
+export { HomeScreen } from './HomeScreen';
+export { ResultsScreen } from './ResultsScreen';
+export { SearchModalScreen } from './SearchModalScreen';

@@ -6,6 +6,8 @@ import {
   TextInput,
   View,
   useColorScheme,
+  TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import SwitchSelector from "react-native-switch-selector";
 import { Button } from "../components/Button.js";
@@ -21,7 +23,7 @@ export const HomeScreen = ({ navigation }) => {
   const [returnDate, onChangeReturnDate] = React.useState(null);
   const [isRoundTrip, setIsRoundTrip] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const styles = style(theme);
+  const styles = style(theme, originText);
 
   const isButtonDisabled =
     !originText ||
@@ -53,89 +55,144 @@ export const HomeScreen = ({ navigation }) => {
 
     //   })
     //   .catch((error) => console.error(error));
-    // setIsLoading(false);
+    setIsLoading(false);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Flights</Text>
-      <SafeAreaView style={styles.box}>
-        <SwitchSelector
-          initial={isRoundTrip ? 0 : 1}
-          onPress={() => {
-            setIsRoundTrip(!isRoundTrip);
-          }}
-          textColor={theme.switch.textColor}
-          selectedColor={theme.switch.selectedColor}
-          buttonColor={theme.switch.buttonColor}
-          borderWidth={0}
-          hasPadding
-          height={42}
-          options={[
-            { label: "Round Trip", value: true },
-            { label: "One Way", value: false },
-          ]}
-          buttonMargin={0}
-          backgroundColor={theme.switch.backgroundColor}
-          textStyle={{ fontFamily: "Poppins-Medium" }}
-          selectedTextContainerStyle={{ color: "white" }}
-          selectedTextStyle={{ fontFamily: "Poppins-Medium" }}
-          testID="trip-switch-selector"
-          accessibilityLabel="trip-switch-selector"
-          style={styles.switcher}
-        />
-        <TextInput
-          style={[styles.input, styles.firstInput]}
-          onChangeText={onChangeOriginText}
-          value={originText}
-          placeholder="Where from?"
-          placeholderTextColor={theme.input.color}
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={onChangeDestinationText}
-          value={destinationText}
-          placeholder="Where to?"
-          placeholderTextColor={theme.input.color}
-        />
-        <View style={styles.datePicker}>
-          <TextInput
-            style={[
-              styles.input,
-              styles.departureInput,
-              isRoundTrip && styles.roundTripInput,
+    <View stlye={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
+        <Text style={styles.title}>Flights</Text>
+        <SafeAreaView style={styles.box}>
+          <SwitchSelector
+            initial={isRoundTrip ? 0 : 1}
+            onPress={() => {
+              setIsRoundTrip(!isRoundTrip);
+            }}
+            textColor={theme.switch.textColor}
+            selectedColor={theme.switch.selectedColor}
+            buttonColor={theme.switch.buttonColor}
+            borderWidth={0}
+            hasPadding
+            height={42}
+            options={[
+              { label: "Round Trip", value: true },
+              { label: "One Way", value: false },
             ]}
-            value={departureDate}
-            onChangeText={onChangeDepartureDate}
-            placeholder="Departure"
-            placeholderTextColor={theme.input.color}
+            buttonMargin={0}
+            backgroundColor={theme.switch.backgroundColor}
+            textStyle={{ fontFamily: "Poppins-Medium" }}
+            selectedTextContainerStyle={{ color: "white" }}
+            selectedTextStyle={{ fontFamily: "Poppins-Medium" }}
+            testID="trip-switch-selector"
+            accessibilityLabel="trip-switch-selector"
+            style={styles.switcher}
           />
-          {isRoundTrip && (
-            <TextInput
-              style={[styles.input, styles.returnInput]}
-              onChangeText={onChangeReturnDate}
-              value={returnDate}
-              placeholder="Return"
-              placeholderTextColor={theme.input.color}
-            />
-          )}
+          <TouchableOpacity
+            style={[styles.input, styles.firstInput]}
+            onPress={() =>
+              navigation.navigate("SearchModal", {
+                placeholder: "Where from?",
+                onChangeText: onChangeOriginText,
+              })
+            }
+          >
+            <Text
+              style={[
+                styles.inputText,
+                {
+                  color: originText
+                    ? theme.primary.text.color
+                    : theme.input.color,
+                },
+              ]}
+            >
+              {originText ? originText : "Where from?"}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.input]}
+            onPress={() =>
+              navigation.navigate("SearchModal", {
+                placeholder: "Where to?",
+                onChangeText: onChangeDestinationText,
+              })
+            }
+          >
+            <Text
+              style={[
+                styles.inputText,
+                {
+                  color: destinationText
+                    ? theme.primary.text.color
+                    : theme.input.color,
+                },
+              ]}
+            >
+              {destinationText ? destinationText : "Where to?"}
+            </Text>
+          </TouchableOpacity>
+          <View style={styles.datePicker}>
+            <TouchableOpacity
+              style={[
+                styles.input,
+                styles.departureInput,
+                isRoundTrip && styles.roundTripInput,
+              ]}
+              onPress={() => {}}
+            >
+              <Text
+                style={[
+                  styles.inputText,
+                  {
+                    color: departureDate
+                      ? theme.primary.text.color
+                      : theme.input.color,
+                  },
+                ]}
+              >
+                {departureDate ? departureDate : "Departure"}
+              </Text>
+            </TouchableOpacity>
+            {isRoundTrip && (
+              <TouchableOpacity
+                style={[styles.input, styles.returnInput]}
+                onPress={() => {}}
+              >
+                <Text
+                  style={[
+                    styles.inputText,
+                    {
+                      color: departureDate
+                        ? theme.primary.text.color
+                        : theme.input.color,
+                    },
+                  ]}
+                >
+                  {departureDate ? departureDate : "Return"}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          <Button
+            title={"Search flights"}
+            styles={isButtonDisabled ? styles.buttonStyle : styles.buttonStyle}
+            onPress={() => fetchFlights()}
+            isDisabled={isButtonDisabled}
+            isLoading={isLoading}
+          />
+        </SafeAreaView>
+        <View>
+          <Text style={styles.sectionTitle}>Recent Searches</Text>
         </View>
-        <Button
-          title={"Search flights"}
-          styles={isButtonDisabled ? styles.buttonStyle : styles.buttonStyle}
-          onPress={() => fetchFlights()}
-          isDisabled={isButtonDisabled}
-          isLoading={isLoading}
-        />
-      </SafeAreaView>
-      <View>
-        <Text style={styles.sectionTitle}>Recent Searches</Text>
-      </View>
+        <View style={styles.resultContainer} />
+        <View style={styles.resultContainer} />
+        <View style={styles.resultContainer} />
+      </ScrollView>
     </View>
   );
 };
 
-const style = (theme) =>
+const style = (theme, originText) =>
   StyleSheet.create({
     title: {
       fontFamily: "Poppins-SemiBold",
@@ -151,14 +208,12 @@ const style = (theme) =>
       fontSize: 24,
       fontWeight: "700",
       alignSelf: "flex-start",
-      paddingBottom: 24,
       paddingTop: 32,
       color: theme.primary.text.color,
     },
     container: {
-      flex: 1,
       paddingHorizontal: 24,
-      paddingBottom: 24,
+      marginBottom: 84,
     },
     switcher: {
       padding: 24,
@@ -171,9 +226,12 @@ const style = (theme) =>
       borderColor: theme.input.color,
       borderRadius: 16,
       padding: 16,
+      alignContent: "center",
+    },
+    inputText: {
       fontFamily: "Poppins-Medium",
       fontSize: 16,
-      color: theme.primary.text.color,
+      color: theme.input.color,
     },
     firstInput: {
       marginTop: 0,
@@ -197,14 +255,14 @@ const style = (theme) =>
       button: {
         height: 60,
         alignSelf: "stretch",
-        backgroundColor: theme.primary.button.color,
+        backgroundColor: theme.secondary.button.color,
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 16,
       },
       buttonText: {
-        color: theme.primary.button.text.color,
-        fontFamily: "Poppins-SemiBold",
+        color: theme.secondary.button.text.color,
+        fontFamily: "Poppins-Medium",
         fontSize: 16,
       },
       container: {
@@ -217,10 +275,12 @@ const style = (theme) =>
       alignSelf: "stretch",
       backgroundColor: theme.onBackgroundColor,
       borderRadius: 40,
-      // shadowOffset: {
-      //   height: 8
-      // },
-      // shadowOpacity: 0.1,
-      // shadowRadius: 25
+    },
+    resultContainer: {
+      marginTop: 24,
+      borderRadius: 40,
+      height: 245,
+      alignSelf: "stretch",
+      backgroundColor: theme.onBackgroundColor,
     },
   });
