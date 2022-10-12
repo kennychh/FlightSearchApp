@@ -9,7 +9,7 @@ import {
   FlatList,
 } from "react-native";
 import { DisplayIcon } from "../components";
-import { MapsArrowDiagonal, ClockOutline, PinAlt } from "iconoir-react-native";
+import { MapsArrowDiagonal, PinAlt } from "iconoir-react-native";
 import { KEY } from "../constants/constants";
 import { themes } from "../constants/theme";
 
@@ -65,12 +65,21 @@ export const SearchModalScreen = ({ route, navigation }) => {
     >
       <DisplayIcon
         icon={
-          <PinAlt
-            color={theme.displayIcon.iconColor}
-            width={24}
-            height={24}
-            strokeWidth={2}
-          />
+          item.iata_code ? (
+            <PinAlt
+              color={theme.displayIcon.iconColor}
+              width={24}
+              height={24}
+              strokeWidth={2}
+            />
+          ) : (
+            <MapsArrowDiagonal
+              color={theme.displayIcon.iconColor}
+              width={24}
+              height={24}
+              strokeWidth={2}
+            />
+          )
         }
       ></DisplayIcon>
       <View style={styles.resultInfoContainer}>
