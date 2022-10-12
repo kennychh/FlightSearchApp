@@ -11,7 +11,7 @@ export const Button = ({
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        // disabled={isDisabled}
+        disabled={isDisabled}
         onPress={() => onPress?.()}
         style={styles.button}
       >

@@ -67,6 +67,7 @@ export const themes = {
       button: {
         text: {
           color: "white",
+          disabledColor: '#757575'
         },
         color: "#313135",
         onBackgroundColor: '#2C2C2D'

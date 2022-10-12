@@ -23,11 +23,11 @@ export const HomeScreen = ({ navigation }) => {
   const [returnDate, onChangeReturnDate] = React.useState(null);
   const [isRoundTrip, setIsRoundTrip] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const styles = style(theme, originText);
+  const styles = style(theme);
 
   const isButtonDisabled =
-    !originText ||
-    !destinationText ||
+    !originText[0] ||
+    !destinationText[0] ||
     !departureDate ||
     (isRoundTrip && !returnDate);
 
@@ -187,7 +187,7 @@ export const HomeScreen = ({ navigation }) => {
           </View>
           <Button
             title={"Search flights"}
-            styles={isButtonDisabled ? styles.buttonStyle : styles.buttonStyle}
+            styles={isButtonDisabled ? styles.disabledButtonStyle : styles.buttonStyle}
             onPress={() => fetchFlights()}
             isDisabled={isButtonDisabled}
             isLoading={isLoading}
@@ -204,7 +204,7 @@ export const HomeScreen = ({ navigation }) => {
   );
 };
 
-const style = (theme, originText) =>
+const style = (theme) =>
   StyleSheet.create({
     title: {
       fontFamily: "Poppins-SemiBold",
@@ -274,6 +274,26 @@ const style = (theme, originText) =>
       },
       buttonText: {
         color: theme.secondary.button.text.color,
+        fontFamily: "Poppins-Medium",
+        fontSize: 16,
+      },
+      container: {
+        paddingHorizontal: 24,
+        paddingBottom: 24,
+        paddingTop: 32,
+      },
+    },
+    disabledButtonStyle: {
+      button: {
+        height: 60,
+        alignSelf: "stretch",
+        backgroundColor: theme.secondary.button.color,
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 16,
+      },
+      buttonText: {
+        color: theme.secondary.button.text.disabledColor,
         fontFamily: "Poppins-Medium",
         fontSize: 16,
       },

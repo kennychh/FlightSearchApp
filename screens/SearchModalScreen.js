@@ -7,6 +7,7 @@ import {
   useColorScheme,
   TouchableOpacity,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { DisplayIcon } from "../components";
 import { MapsArrowDiagonal, PinAlt } from "iconoir-react-native";
@@ -17,7 +18,6 @@ export const SearchModalScreen = ({ route, navigation }) => {
   const colorScheme = useColorScheme();
   const theme = colorScheme === "dark" ? themes.dark : themes.light;
   const styles = style(theme);
-  const [isLoading, setIsLoading] = useState(false);
   const defaultResults = [
     { country: "Current location", iata_code: null, name: "Toronto" },
   ];
