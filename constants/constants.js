@@ -1,3 +1,5 @@
 import { StatusBar, Platform  } from "react-native";
 
-export const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 44 : StatusBar.currentHeight
+export const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 44 : StatusBar.currentHeight;
+export const KEY =
+"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI0IiwianRpIjoiMDhhMTU2OTFjOGQ2ZDU0YjA3ZWI5OWZiMzcyNzgxZDAxYjFmMDhkM2ZlM2I2MWQ0MGNmMTZmMzJmY2FjM2UxNTFjMjAxOWE3NGIxZjA1YmMiLCJpYXQiOjE2NjU1NDY1NTIsIm5iZiI6MTY2NTU0NjU1MiwiZXhwIjoxNjk3MDgyNTUyLCJzdWIiOiIxNDg1NCIsInNjb3BlcyI6W119.azAw1IeYO8TZ-2Z20KxLJbeA72YWMKn5PUknFjse_x6trhOwwWe5nnVSkeoVVbmM1enkotFcCNzgWpjakHYMxw";

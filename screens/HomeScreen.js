@@ -11,14 +11,14 @@ import {
 } from "react-native";
 import SwitchSelector from "react-native-switch-selector";
 import { Button } from "../components/Button.js";
-import { STATUSBAR_HEIGHT } from "../constants/constants";
+import { STATUSBAR_HEIGHT, KEY } from "../constants/constants";
 import { themes } from "../constants/theme";
 
 export const HomeScreen = ({ navigation }) => {
   const colorScheme = useColorScheme();
   const theme = colorScheme === "dark" ? themes.dark : themes.light;
-  const [originText, onChangeOriginText] = React.useState(null);
-  const [destinationText, onChangeDestinationText] = React.useState(null);
+  const [originText, onChangeOriginText] = React.useState([null,null]);
+  const [destinationText, onChangeDestinationText] = React.useState([null,null]);
   const [departureDate, onChangeDepartureDate] = React.useState(null);
   const [returnDate, onChangeReturnDate] = React.useState(null);
   const [isRoundTrip, setIsRoundTrip] = useState(true);
@@ -31,30 +31,30 @@ export const HomeScreen = ({ navigation }) => {
     !departureDate ||
     (isRoundTrip && !returnDate);
 
-  const key =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI0IiwianRpIjoiMDc0YzBkN2U0MThmNzQwZmVlN2UwZjFkN2ZmZTAzMDVmYjMxZWNkYWQ1OTZlMmE4NTEyZTkzNDNmOWRmNzEyN2YzN2YzYTE0YmU4N2RhNTYiLCJpYXQiOjE2NjUzNTUxODEsIm5iZiI6MTY2NTM1NTE4MSwiZXhwIjoxNjk2ODkxMTgxLCJzdWIiOiIxNDc0NCIsInNjb3BlcyI6W119.c4-Lr5o2P81-6CnBj2htVE_caCb00c6eur0g-T_wMr7Ts4AKzm580eifC1-jziiymagidu_FMM9VzXPXkmrL4Q";
   const fetchFlights = async () => {
-    navigation.navigate("Results", {
-      data: [],
-      headerTitle: "Toronto - Tokyo",
-    });
     setIsLoading(true);
-    // await fetch(
-    //   `https://app.goflightlabs.com/search-best-flights?access_key=${key}&adults=1&origin=${originText}&destination=${destinationText}&departureDate=${departureDate}${
-    //     isRoundTrip ? `&returnDate=${returnDate}` : ``
-    //   }`
-    // )
-    //   .then((response) => response.json())
-    //   .then((json) => {
-    //     if(json["data"]["error"]){
-    //       console.log(json["data"]["message"])
-    //     }
-    //     else {
-    //       navigation.navigate("Results", { data: json })
-    //     }
+    await fetch(
+      `https://app.goflightlabs.com/search-best-flights?access_key=${KEY}&adults=1&origin=${originText[1]}&destination=${destinationText[1]}&departureDate=${departureDate}${
+        isRoundTrip ? `&returnDate=${returnDate}` : ``
+      }`
+    )
+      .then((response) => response.json())
+      .then((json) => {
+        if(!json.data){
+          console.log("ERROR: ", json)
+        }
+        else if (json.data.error) {
+          console.log("API Request Error: ", json)
+        }
+        else if (Array.isArray(json.data) && json.data.length == 0) {
+          console.log("API Request Error: ", json)
+        }
+        else {
+          navigation.navigate("Results", { data: json })
+        }
 
-    //   })
-    //   .catch((error) => console.error(error));
+      })
+      .catch((error) => console.error(error));
     setIsLoading(false);
   };
 
@@ -97,16 +97,17 @@ export const HomeScreen = ({ navigation }) => {
             }
           >
             <Text
+              numberOfLines={1}
               style={[
                 styles.inputText,
                 {
-                  color: originText
+                  color: originText[0]
                     ? theme.primary.text.color
                     : theme.input.color,
                 },
               ]}
             >
-              {originText ? originText : "Where from?"}
+              {originText[0] ? originText[0] : "Where from?"}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -119,16 +120,17 @@ export const HomeScreen = ({ navigation }) => {
             }
           >
             <Text
+              numberOfLines={1}
               style={[
                 styles.inputText,
                 {
-                  color: destinationText
+                  color: destinationText[0]
                     ? theme.primary.text.color
                     : theme.input.color,
                 },
               ]}
             >
-              {destinationText ? destinationText : "Where to?"}
+              {destinationText[0] ? destinationText[0] : "Where to?"}
             </Text>
           </TouchableOpacity>
           <View style={styles.datePicker}>
@@ -138,7 +140,12 @@ export const HomeScreen = ({ navigation }) => {
                 styles.departureInput,
                 isRoundTrip && styles.roundTripInput,
               ]}
-              onPress={() => {}}
+              onPress={() =>
+                navigation.navigate("CalendarModal", {
+                  isRoundTrip: isRoundTrip,
+                  onChangeDepartureDate: onChangeDepartureDate,
+                  onChangeReturnDate: onChangeReturnDate,
+                })}
             >
               <Text
                 style={[
@@ -156,7 +163,12 @@ export const HomeScreen = ({ navigation }) => {
             {isRoundTrip && (
               <TouchableOpacity
                 style={[styles.input, styles.returnInput]}
-                onPress={() => {}}
+                onPress={() =>
+                  navigation.navigate("CalendarModal", {
+                    isRoundTrip: isRoundTrip,
+                    onChangeDepartureDate: onChangeDepartureDate,
+                    onChangeReturnDate: onChangeReturnDate,
+                  })}
               >
                 <Text
                   style={[
@@ -168,7 +180,7 @@ export const HomeScreen = ({ navigation }) => {
                     },
                   ]}
                 >
-                  {departureDate ? departureDate : "Return"}
+                  {returnDate ? returnDate : "Return"}
                 </Text>
               </TouchableOpacity>
             )}

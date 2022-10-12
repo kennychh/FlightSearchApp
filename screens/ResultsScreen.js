@@ -29,6 +29,7 @@ export const ResultsScreen = ({ route, navigation }) => {
   const styles = style(theme)
   const { data, headerTitle } = route.params;
   const insets = useSafeAreaInsets();
+  console.log(data)
 
 
   const Item = ({ title }) => (

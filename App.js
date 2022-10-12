@@ -17,7 +17,7 @@ import {
 } from "iconoir-react-native";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { HomeScreen, ResultsScreen, SearchModalScreen } from "./screens";
+import { HomeScreen, ResultsScreen, SearchModalScreen, CalendarModalScreen } from "./screens";
 import { createStackNavigator } from "@react-navigation/stack";
 import { STATUSBAR_HEIGHT } from "./constants/constants";
 import { themes } from "./constants/theme";
@@ -48,6 +48,7 @@ export default function App() {
   const [fontsLoaded] = useFonts({
     "Poppins-Medium": require("./assets/fonts/Poppins-Medium.ttf"),
     "Poppins-SemiBold": require("./assets/fonts/Poppins-SemiBold.ttf"),
+    "Poppins-Regular": require("./assets/fonts/Poppins-Regular.ttf"),
   });
 
   const DismissKeyboard = ({ children }) => (
@@ -135,7 +136,6 @@ export default function App() {
   }
 
   return (
-    <DismissKeyboard>
       <NavigationContainer theme={MyTheme}>
         {
           <Stack.Navigator>
@@ -186,11 +186,21 @@ export default function App() {
                   gestureResponseDistance: 400
                   
                 }}/>
+              <Stack.Screen 
+                name="CalendarModal"
+                component={CalendarModalScreen}
+                options={{
+                  cardStyle: {
+                    backgroundColor: 'transparent'
+                  },
+                  headerShown: false,
+                  gestureResponseDistance: 600
+                  
+                }}/>
             </Stack.Group>
           </Stack.Navigator>
         }
       </NavigationContainer>
-    </DismissKeyboard>
   );
 }
 

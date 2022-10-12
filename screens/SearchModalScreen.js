@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,52 +6,111 @@ import {
   View,
   useColorScheme,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 import { DisplayIcon } from "../components";
-import { MapsArrowDiagonal, ClockOutline } from "iconoir-react-native";
+import { MapsArrowDiagonal, ClockOutline, PinAlt } from "iconoir-react-native";
+import { KEY } from "../constants/constants";
 import { themes } from "../constants/theme";
 
 export const SearchModalScreen = ({ route, navigation }) => {
   const colorScheme = useColorScheme();
   const theme = colorScheme === "dark" ? themes.dark : themes.light;
   const styles = style(theme);
+  const [isLoading, setIsLoading] = useState(false);
+  const defaultResults = [
+    { country: "Current location", iata_code: null, name: "Toronto" },
+  ];
+  const [results, setResults] = useState(defaultResults);
   const { placeholder, onChangeText } = route.params;
   const [text, setText] = React.useState(null);
 
-  return (
-      <View style={{ flex: 1 }}>
-        <View style={styles.modalContainer}>
-          <View style={styles.pill} />
-          <TextInput
-            autoFocus={true}
-            style={[styles.input]}
-            onChangeText={setText}
-            value={text}
-            placeholder={placeholder}
-            placeholderTextColor={theme.input.color}
+  const fetchResults = useCallback(async () => {
+    await fetch(
+      `https://app.goflightlabs.com/get-airport-data?access_key=${KEY}&query=${text}`
+    )
+      .then((response) => response.json())
+      .then((json) => {
+        if (!json["data"]) {
+          console.log(json);
+        } else {
+          setResults(json["data"]);
+        }
+      })
+      .catch((error) => console.error(error));
+  }, [text]);
+
+  const setToDefaultResaults = useCallback(() => {
+    setResults(defaultResults);
+  }, [text]);
+
+  useEffect(() => {
+    if (text && text.length > 2) {
+      const timer = setTimeout(() => {
+        fetchResults();
+      }, 500);
+      return () => clearTimeout(timer);
+    } else if (!text) {
+      setToDefaultResaults();
+    }
+  }, [fetchResults, text]);
+
+  const ResultItem = ({ item }) => (
+    <TouchableOpacity
+      onPress={() => {
+        onChangeText([item.name, item.iata_code]);
+        navigation.goBack();
+      }}
+      style={styles.resultContainer}
+    >
+      <DisplayIcon
+        icon={
+          <PinAlt
+            color={theme.displayIcon.iconColor}
+            width={24}
+            height={24}
+            strokeWidth={2}
           />
-          <TouchableOpacity
-            style={styles.currentLocation}
-            onPress={() => {
-              onChangeText(text);
-              navigation.goBack();
-            }}
-          >
-            <DisplayIcon
-              icon={
-                <MapsArrowDiagonal
-                  color={theme.displayIcon.iconColor}
-                  width={24}
-                  height={24}
-                  strokeWidth={2}
-                />
-              }
-            ></DisplayIcon>
-            <Text style={styles.currentLocationText}>Current Location</Text>
-          </TouchableOpacity>
-          <Text style={styles.recentText}>Recent</Text>
+        }
+      ></DisplayIcon>
+      <View style={styles.resultInfoContainer}>
+        <Text style={styles.resultTitle}>{item.name}</Text>
+        <View style={styles.resultSubInfoContainer}>
+          <Text style={styles.resultSubInfo}>{item.country}</Text>
+          {item.iata_code && (
+            <Text style={[styles.resultSubInfo, styles.textDivider]}>·</Text>
+          )}
+          <Text style={styles.resultSubInfo}>{item.iata_code}</Text>
         </View>
       </View>
+    </TouchableOpacity>
+  );
+
+  const renderItem = ({ item }) => {
+    return <ResultItem item={item} onPress={() => {}} />;
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
+      <View style={styles.modalContainer}>
+        <View style={styles.pill} />
+        <TextInput
+          autoFocus={true}
+          style={[styles.input]}
+          onChangeText={setText}
+          value={text}
+          placeholder={placeholder}
+          placeholderTextColor={theme.input.color}
+        />
+        <FlatList
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+          data={results}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.iata_code}
+        />
+      </View>
+    </View>
   );
 };
 
@@ -59,7 +118,6 @@ const style = (theme) =>
   StyleSheet.create({
     modalContainer: {
       marginTop: 32,
-      paddingHorizontal: 24,
       alignContent: "center",
       alignSelf: "stretch",
       height: "100%",
@@ -67,17 +125,22 @@ const style = (theme) =>
       borderTopRightRadius: 40,
       borderTopLeftRadius: 40,
     },
+    scrollView: {
+      paddingHorizontal: 24,
+    },
     pill: {
       alignSelf: "center",
       width: 48,
       height: 4,
       borderRadius: 8,
       backgroundColor: theme.icon.inactive.color,
-      marginTop: 16,
+      marginTop: 12,
     },
     input: {
+      marginHorizontal: 24,
       height: 60,
       marginTop: 32,
+      marginBottom: 32,
       borderWidth: 2,
       borderColor: theme.input.color,
       borderRadius: 16,
@@ -86,14 +149,33 @@ const style = (theme) =>
       fontSize: 16,
       color: theme.primary.text.color,
     },
-    currentLocation: {
-      paddingTop: 32,
+    resultContainer: {
+      paddingHorizontal: 24,
+      paddingBottom: 24,
       flexDirection: "row",
       alignItems: "center",
     },
-    currentLocationText: {
+    resultInfoContainer: {
+      flexDirection: "column",
+      justifyContent: "space-around",
+      height: 48,
+    },
+    resultSubInfoContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingLeft: 24,
+    },
+    resultSubInfo: {
       fontFamily: "Poppins-Medium",
-      fontSize: 14,
+      fontSize: 12,
+      color: theme.secondary.text.color,
+    },
+    textDivider: {
+      paddingHorizontal: 8,
+    },
+    resultTitle: {
+      fontFamily: "Poppins-Medium",
+      fontSize: 16,
       color: theme.primary.text.color,
       paddingLeft: 24,
     },
