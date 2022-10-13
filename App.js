@@ -17,7 +17,13 @@ import {
 } from "iconoir-react-native";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { HomeScreen, ResultsScreen, SearchModalScreen, CalendarModalScreen } from "./screens";
+import {
+  HomeScreen,
+  ResultsScreen,
+  SearchModalScreen,
+  CalendarModalScreen,
+  TravelOptionsModalScreen,
+} from "./screens";
 import { createStackNavigator } from "@react-navigation/stack";
 import { STATUSBAR_HEIGHT } from "./constants/constants";
 import { themes } from "./constants/theme";
@@ -70,7 +76,17 @@ export default function App() {
           initialRouteName={homeName}
           screenOptions={({ route }) => ({
             tabBarShowLabel: false,
-            headerShown: false,
+            headerBackTitleVisible: false,
+            headerTitle: 'Flights',
+            headerStyle: {
+              height: STATUSBAR_HEIGHT + 72,
+              backgroundColor: theme.backgroundColor,
+            },
+            headerTitleStyle: {
+              fontFamily: "Poppins-SemiBold",
+              fontSize: 16,
+              color: theme.backgroundColor,
+            },
             tabBarItemStyle: {
               paddingTop: 16,
             },
@@ -136,71 +152,82 @@ export default function App() {
   }
 
   return (
-      <NavigationContainer theme={MyTheme}>
-        {
-          <Stack.Navigator>
-            <Stack.Group>
-              <Stack.Screen name="Main" options={{ headerShown: false }}>
-                {(props) => (
-                  <MainScreen
-                    {...props}
-                    resultsHeaderTitle={resultsHeaderTitle}
+    <NavigationContainer theme={MyTheme}>
+      {
+        <Stack.Navigator>
+          <Stack.Group>
+            <Stack.Screen name="Main" options={{ headerShown: false }}>
+              {(props) => (
+                <MainScreen
+                  {...props}
+                  resultsHeaderTitle={resultsHeaderTitle}
+                />
+              )}
+            </Stack.Screen>
+            <Stack.Screen
+              name="Results"
+              component={ResultsScreen}
+              options={{
+                headerBackImage: () => (
+                  <ArrowLeft
+                    width={25}
+                    height={25}
+                    color={theme.icon.color}
+                    strokeWidth={2}
+                    marginLeft={24}
                   />
-                )}
-              </Stack.Screen>
-              <Stack.Screen
-                name="Results"
-                component={ResultsScreen}
-                options={{
-                  headerBackImage: () => (
-                    <ArrowLeft
-                      width={25}
-                      height={25}
-                      color={theme.icon.color}
-                      strokeWidth={2}
-                      marginLeft={24}
-                    />
-                  ),
-                  headerBackTitleVisible: false,
-                  headerStyle: {
-                    height: STATUSBAR_HEIGHT + 72,
-                    backgroundColor: theme.backgroundColor,
-                  },
-                  headerTitleStyle: {
-                    fontFamily: "Poppins-SemiBold",
-                    fontSize: 16,
-                    color: theme.primary.text.color,
-                  },
-                }}
-              />
-            </Stack.Group>
-            <Stack.Group screenOptions={{ presentation: 'modal' }}>
-              <Stack.Screen 
-                name="SearchModal"
-                component={SearchModalScreen}
-                options={{
-                  cardStyle: {
-                    backgroundColor: 'transparent'
-                  },
-                  headerShown: false,
-                  gestureResponseDistance: 400
-                  
-                }}/>
-              <Stack.Screen 
-                name="CalendarModal"
-                component={CalendarModalScreen}
-                options={{
-                  cardStyle: {
-                    backgroundColor: 'transparent'
-                  },
-                  headerShown: false,
-                  gestureResponseDistance: 600
-                  
-                }}/>
-            </Stack.Group>
-          </Stack.Navigator>
-        }
-      </NavigationContainer>
+                ),
+                headerBackTitleVisible: false,
+                headerStyle: {
+                  height: STATUSBAR_HEIGHT + 72,
+                  backgroundColor: theme.backgroundColor,
+                },
+                headerTitleStyle: {
+                  fontFamily: "Poppins-SemiBold",
+                  fontSize: 16,
+                  color: theme.primary.text.color,
+                },
+              }}
+            />
+          </Stack.Group>
+          <Stack.Group screenOptions={{ presentation: "modal" }}>
+            <Stack.Screen
+              name="SearchModal"
+              component={SearchModalScreen}
+              options={{
+                cardStyle: {
+                  backgroundColor: "transparent",
+                },
+                headerShown: false,
+                gestureResponseDistance: 400,
+              }}
+            />
+            <Stack.Screen
+              name="CalendarModal"
+              component={CalendarModalScreen}
+              options={{
+                cardStyle: {
+                  backgroundColor: "transparent",
+                },
+                headerShown: false,
+                gestureResponseDistance: 600,
+              }}
+            />
+            <Stack.Screen
+              name="TravelOptionsModal"
+              component={TravelOptionsModalScreen}
+              options={{
+                cardStyle: {
+                  backgroundColor: "transparent",
+                },
+                headerShown: false,
+                gestureResponseDistance: 600,
+              }}
+            />
+          </Stack.Group>
+        </Stack.Navigator>
+      }
+    </NavigationContainer>
   );
 }
 

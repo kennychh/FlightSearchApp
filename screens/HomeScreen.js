@@ -17,8 +17,11 @@ import { themes } from "../constants/theme";
 export const HomeScreen = ({ navigation }) => {
   const colorScheme = useColorScheme();
   const theme = colorScheme === "dark" ? themes.dark : themes.light;
-  const [originText, onChangeOriginText] = React.useState([null,null]);
-  const [destinationText, onChangeDestinationText] = React.useState([null,null]);
+  const [originText, onChangeOriginText] = React.useState([null, null]);
+  const [destinationText, onChangeDestinationText] = React.useState([
+    null,
+    null,
+  ]);
   const [departureDate, onChangeDepartureDate] = React.useState(null);
   const [returnDate, onChangeReturnDate] = React.useState(null);
   const [isRoundTrip, setIsRoundTrip] = useState(true);
@@ -34,25 +37,23 @@ export const HomeScreen = ({ navigation }) => {
   const fetchFlights = async () => {
     setIsLoading(true);
     await fetch(
-      `https://app.goflightlabs.com/search-best-flights?access_key=${KEY}&adults=1&origin=${originText[1]}&destination=${destinationText[1]}&departureDate=${departureDate}${
+      `https://app.goflightlabs.com/search-best-flights?access_key=${KEY}&adults=1&origin=${
+        originText[1]
+      }&destination=${destinationText[1]}&departureDate=${departureDate}${
         isRoundTrip ? `&returnDate=${returnDate}` : ``
       }`
     )
       .then((response) => response.json())
       .then((json) => {
-        if(!json.data){
-          console.log("ERROR: ", json)
+        if (!json.data) {
+          console.log("ERROR: ", json);
+        } else if (json.data.error) {
+          console.log("API Request Error: ", json);
+        } else if (Array.isArray(json.data) && json.data.length == 0) {
+          console.log("API Request Error: ", json);
+        } else {
+          navigation.navigate("Results", { data: json });
         }
-        else if (json.data.error) {
-          console.log("API Request Error: ", json)
-        }
-        else if (Array.isArray(json.data) && json.data.length == 0) {
-          console.log("API Request Error: ", json)
-        }
-        else {
-          navigation.navigate("Results", { data: json })
-        }
-
       })
       .catch((error) => console.error(error));
     setIsLoading(false);
@@ -65,8 +66,9 @@ export const HomeScreen = ({ navigation }) => {
         <SafeAreaView style={styles.box}>
           <SwitchSelector
             initial={isRoundTrip ? 0 : 1}
-            onPress={() => {
-              setIsRoundTrip(!isRoundTrip);
+            onPress={(value) => {
+              if ((value == 0 && !isRoundTrip) || (value == 1 && isRoundTrip))
+                setIsRoundTrip(!isRoundTrip);
             }}
             textColor={theme.switch.textColor}
             selectedColor={theme.switch.selectedColor}
@@ -75,8 +77,8 @@ export const HomeScreen = ({ navigation }) => {
             hasPadding
             height={42}
             options={[
-              { label: "Round Trip", value: true },
-              { label: "One Way", value: false },
+              { label: "Round Trip", value: 0 },
+              { label: "One Way", value: 1 },
             ]}
             buttonMargin={0}
             backgroundColor={theme.switch.backgroundColor}
@@ -145,7 +147,8 @@ export const HomeScreen = ({ navigation }) => {
                   isRoundTrip: isRoundTrip,
                   onChangeDepartureDate: onChangeDepartureDate,
                   onChangeReturnDate: onChangeReturnDate,
-                })}
+                })
+              }
             >
               <Text
                 style={[
@@ -168,7 +171,8 @@ export const HomeScreen = ({ navigation }) => {
                     isRoundTrip: isRoundTrip,
                     onChangeDepartureDate: onChangeDepartureDate,
                     onChangeReturnDate: onChangeReturnDate,
-                  })}
+                  })
+                }
               >
                 <Text
                   style={[
@@ -183,11 +187,21 @@ export const HomeScreen = ({ navigation }) => {
                   {returnDate ? returnDate : "Return"}
                 </Text>
               </TouchableOpacity>
-            )}
+            )}    
           </View>
+          <TouchableOpacity
+              style={styles.input}
+              onPress={() => navigation.navigate("TravelOptionsModal", {})}
+            >
+              <Text numberOfLines={1} style={styles.travellerInfoText}>
+              3 Travellers, Premium Economy
+              </Text>
+            </TouchableOpacity>
           <Button
             title={"Search flights"}
-            styles={isButtonDisabled ? styles.disabledButtonStyle : styles.buttonStyle}
+            styles={
+              isButtonDisabled ? styles.disabledButtonStyle : styles.buttonStyle
+            }
             onPress={() => fetchFlights()}
             isDisabled={isButtonDisabled}
             isLoading={isLoading}
@@ -212,7 +226,7 @@ const style = (theme) =>
       fontWeight: "700",
       alignSelf: "flex-start",
       paddingBottom: 32,
-      marginTop: STATUSBAR_HEIGHT + 80,
+      marginTop: 8,
       color: theme.primary.text.color,
     },
     sectionTitle: {
@@ -244,6 +258,11 @@ const style = (theme) =>
       fontFamily: "Poppins-Medium",
       fontSize: 16,
       color: theme.input.color,
+    },
+    travellerInfoText: {
+      fontFamily: "Poppins-Medium",
+      fontSize: 16,
+      color: theme.primary.text.color
     },
     firstInput: {
       marginTop: 0,
