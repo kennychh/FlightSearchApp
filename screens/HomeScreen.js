@@ -194,7 +194,7 @@ export const HomeScreen = ({ navigation }) => {
               onPress={() => navigation.navigate("TravelOptionsModal", {})}
             >
               <Text numberOfLines={1} style={styles.travellerInfoText}>
-              3 Travellers, Premium Economy
+              1 Adult, Economy
               </Text>
             </TouchableOpacity>
           <Button
