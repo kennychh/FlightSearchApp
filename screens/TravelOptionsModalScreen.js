@@ -7,11 +7,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { IncrementCounter, Button } from "../components";
-import {
-  NavArrowDown,
-  NavArrowUp,
-  Check,
-} from "iconoir-react-native";
+import { NavArrowDown, NavArrowUp, Check } from "iconoir-react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { KEY } from "../constants/constants";
 import { themes } from "../constants/theme";
@@ -20,15 +16,16 @@ import { ScrollView } from "react-native-gesture-handler";
 export const TravelOptionsModalScreen = ({ route, navigation }) => {
   const colorScheme = useColorScheme();
   const theme = colorScheme === "dark" ? themes.dark : themes.light;
+  const { setChildAges, childAges, numAdults, setNumAdults, seatType, setSeatType } = route.params;
   const styles = style(theme);
   const [open, setOpen] = useState(false);
-  const [counter, setCounter] = useState(1);
-  const [value, setValue] = useState("economy");
+  const [counter, setCounter] = useState(numAdults);
+  const [value, setValue] = useState(seatType);
   const [items, setItems] = useState([
-    { label: "Economy", value: "economy" },
-    { label: "Premium Economy", value: "premiumeconomy" },
-    { label: "Business", value: "business" },
-    { label: "First", value: "first" },
+    { label: "Economy", value: "Economy" },
+    { label: "Premium Economy", value: "Premium Economy" },
+    { label: "Business", value: "Business" },
+    { label: "First", value: "First" },
   ]);
   const [ageItems, setAgesItems] = useState([
     { label: "0", value: 0 },
@@ -48,15 +45,15 @@ export const TravelOptionsModalScreen = ({ route, navigation }) => {
     { label: "14", value: 14 },
     { label: "15", value: 15 },
   ]);
-  const [childrenCounters, setChildrenCounters] = useState(0);
-  const [child1Age, setChild1Age] = useState(0);
-  const [child2Age, setChild2Age] = useState(0);
-  const [child3Age, setChild3Age] = useState(0);
-  const [child4Age, setChild4Age] = useState(0);
-  const [child5Age, setChild5Age] = useState(0);
-  const [child6Age, setChild6Age] = useState(0);
-  const [child7Age, setChild7Age] = useState(0);
-  const [child8Age, setChild8Age] = useState(0);
+  const [childrenCounters, setChildrenCounters] = useState(childAges[8]);
+  const [child1Age, setChild1Age] = useState(childAges[0]);
+  const [child2Age, setChild2Age] = useState(childAges[1]);
+  const [child3Age, setChild3Age] = useState(childAges[2]);
+  const [child4Age, setChild4Age] = useState(childAges[3]);
+  const [child5Age, setChild5Age] = useState(childAges[4]);
+  const [child6Age, setChild6Age] = useState(childAges[5]);
+  const [child7Age, setChild7Age] = useState(childAges[6]);
+  const [child8Age, setChild8Age] = useState(childAges[7]);
   const [openChild1, setOpenChild1] = useState(false);
   const [openChild2, setOpenChild2] = useState(false);
   const [openChild3, setOpenChild3] = useState(false);
@@ -145,10 +142,51 @@ export const TravelOptionsModalScreen = ({ route, navigation }) => {
             dropDownDirection="BOTTOM"
             scrollViewProps={{ nestedScrollEnabled: true }}
             listMode="SCROLLVIEW"
+            ArrowUpIconComponent={() => (
+              <NavArrowUp
+                color={theme.displayIcon.iconColor}
+                width={24}
+                height={24}
+                strokeWidth={2}
+              />
+            )}
+            ArrowDownIconComponent={() => (
+              <NavArrowDown
+                color={theme.displayIcon.iconColor}
+                width={24}
+                height={24}
+                strokeWidth={2}
+              />
+            )}
+            TickIconComponent={() => (
+              <Check
+                color={theme.displayIcon.iconColor}
+                width={24}
+                height={24}
+                strokeWidth={2}
+              />
+            )}
           />
         </View>
       </View>
     );
+  };
+
+  const onPress = () => {
+    setChildAges([
+      child1Age,
+      child2Age,
+      child3Age,
+      child4Age,
+      child5Age,
+      child6Age,
+      child7Age,
+      child8Age,
+      childrenCounters,
+    ]);
+    setNumAdults(counter);
+    setSeatType(value)
+    navigation.goBack();
   };
 
   return (
@@ -239,7 +277,7 @@ export const TravelOptionsModalScreen = ({ route, navigation }) => {
           {childrenCounters >= 8 && <ChildAgeDropDownPicker index={7} />}
           <View style={{ height: 200 }}></View>
         </ScrollView>
-        <Button title={"Done"} styles={styles.buttonStyle} onPress={() => {}} />
+        <Button title={"Done"} styles={styles.buttonStyle} onPress={onPress} />
       </View>
     </SafeAreaView>
   );

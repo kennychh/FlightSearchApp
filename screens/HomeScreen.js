@@ -26,6 +26,13 @@ export const HomeScreen = ({ navigation }) => {
   const [returnDate, onChangeReturnDate] = React.useState(null);
   const [isRoundTrip, setIsRoundTrip] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [childAges, setChildAges] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  const [numAdults, setNumAdults] = useState(1);
+  const [seatType, setSeatType] = useState("Economy");
+  const travelOptionsText =
+    childAges[8] + numAdults > 1
+      ? `${childAges[8] + numAdults} Travellers, ${seatType}`
+      : `1 Adult, ${seatType}`;
   const styles = style(theme);
 
   const isButtonDisabled =
@@ -187,16 +194,25 @@ export const HomeScreen = ({ navigation }) => {
                   {returnDate ? returnDate : "Return"}
                 </Text>
               </TouchableOpacity>
-            )}    
+            )}
           </View>
           <TouchableOpacity
-              style={styles.input}
-              onPress={() => navigation.navigate("TravelOptionsModal", {})}
-            >
-              <Text numberOfLines={1} style={styles.travellerInfoText}>
-              1 Adult, Economy
-              </Text>
-            </TouchableOpacity>
+            style={styles.input}
+            onPress={() =>
+              navigation.navigate("TravelOptionsModal", {
+                setChildAges: setChildAges,
+                childAges: childAges,
+                numAdults: numAdults,
+                setNumAdults: setNumAdults,
+                seatType: seatType,
+                setSeatType: setSeatType,
+              })
+            }
+          >
+            <Text numberOfLines={1} style={styles.travellerInfoText}>
+              {travelOptionsText}
+            </Text>
+          </TouchableOpacity>
           <Button
             title={"Search flights"}
             styles={
@@ -262,7 +278,7 @@ const style = (theme) =>
     travellerInfoText: {
       fontFamily: "Poppins-Medium",
       fontSize: 16,
-      color: theme.primary.text.color
+      color: theme.primary.text.color,
     },
     firstInput: {
       marginTop: 0,
