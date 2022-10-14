@@ -41,14 +41,27 @@ export const HomeScreen = ({ navigation }) => {
     !departureDate ||
     (isRoundTrip && !returnDate);
 
+  //TODO: add error when Only 1 child (aged 0-2) per adult is allowed
+  const childAgeString = () => {
+    const numChildren = childAges[8];
+    let string = numChildren > 0  ? '&' : '';
+    for (let i = 0; i < numChildren; i++) {
+      string = string + `childAge${i+1}=${childAges[i]}`
+      if(i < numChildren -1){
+        string = string + '&';
+      }
+    }
+    return string
+  }
+
   const fetchFlights = async () => {
     setIsLoading(true);
     await fetch(
-      `https://app.goflightlabs.com/search-best-flights?access_key=${KEY}&adults=1&origin=${
+      `https://app.goflightlabs.com/search-best-flights?access_key=${KEY}&adults=${numAdults}&origin=${
         originText[1]
       }&destination=${destinationText[1]}&departureDate=${departureDate}${
         isRoundTrip ? `&returnDate=${returnDate}` : ``
-      }`
+      }${childAgeString()}`
     )
       .then((response) => response.json())
       .then((json) => {
