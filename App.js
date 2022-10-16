@@ -79,7 +79,6 @@ export default function App() {
             headerBackTitleVisible: false,
             headerTitle: 'Flights',
             headerStyle: {
-              height: STATUSBAR_HEIGHT + 72,
               backgroundColor: theme.backgroundColor,
             },
             headerTitleStyle: {
@@ -179,7 +178,6 @@ export default function App() {
                 ),
                 headerBackTitleVisible: false,
                 headerStyle: {
-                  height: STATUSBAR_HEIGHT + 72,
                   backgroundColor: theme.backgroundColor,
                 },
                 headerTitleStyle: {
