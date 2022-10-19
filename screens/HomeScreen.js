@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -14,7 +14,7 @@ import { Button } from "../components/Button.js";
 import { STATUSBAR_HEIGHT, KEY } from "../constants/constants";
 import { themes } from "../constants/theme";
 
-export const HomeScreen = ({ navigation }) => {
+export const HomeScreen = ({ navigation, fadeIn, fadeOut, headerTitleFadeAnim }) => {
   const colorScheme = useColorScheme();
   const theme = colorScheme === "dark" ? themes.dark : themes.light;
   const [originText, onChangeOriginText] = React.useState([null, null]);
@@ -41,18 +41,32 @@ export const HomeScreen = ({ navigation }) => {
     !departureDate ||
     (isRoundTrip && !returnDate);
 
+  const [pos, setPos] = useState(0);
+  const [isFadeIn, setIsFadeIn] = useState(false)
+
+  useEffect(()=> {
+    if(pos > 50 && !isFadeIn) {
+      fadeIn(headerTitleFadeAnim);
+      setIsFadeIn(true)
+    }
+    else if (pos <= 50 && isFadeIn) {
+      fadeOut(headerTitleFadeAnim);
+      setIsFadeIn(false)
+    }
+  }, [pos])
+
   //TODO: add error when Only 1 child (aged 0-2) per adult is allowed
   const childAgeString = () => {
     const numChildren = childAges[8];
-    let string = numChildren > 0  ? '&' : '';
+    let string = numChildren > 0 ? "&" : "";
     for (let i = 0; i < numChildren; i++) {
-      string = string + `childAge${i+1}=${childAges[i]}`
-      if(i < numChildren -1){
-        string = string + '&';
+      string = string + `childAge${i + 1}=${childAges[i]}`;
+      if (i < numChildren - 1) {
+        string = string + "&";
       }
     }
-    return string
-  }
+    return string;
+  };
 
   const fetchFlights = async () => {
     setIsLoading(true);
@@ -72,16 +86,19 @@ export const HomeScreen = ({ navigation }) => {
         } else if (Array.isArray(json.data) && json.data.length == 0) {
           console.log("API Request Error: ", json);
         } else {
-          navigation.navigate("Results", { data: json });
+          navigation.navigate("Results", {
+            data: json,
+            stickyHeaderTitle: `${originText[0]} - ${destinationText[0]}`,
+            headerTitle: `${originText[0]} (${originText[1]}) - ${destinationText[0]} (${destinationText[1]})`,
+          });
         }
       })
       .catch((error) => console.error(error));
     setIsLoading(false);
   };
-
   return (
     <View stlye={{ flex: 1 }}>
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} scrollEventThrottle={16} onScroll={(e) => setPos(e.nativeEvent.contentOffset.y)}>
         <Text style={styles.title}>Flights</Text>
         <SafeAreaView style={styles.box}>
           <SwitchSelector
@@ -263,7 +280,8 @@ const style = (theme) =>
       fontSize: 24,
       fontWeight: "700",
       alignSelf: "flex-start",
-      paddingTop: 32,
+      paddingTop: 48,
+      marginBottom: 32,
       color: theme.primary.text.color,
     },
     container: {
@@ -357,7 +375,7 @@ const style = (theme) =>
       borderRadius: 40,
     },
     resultContainer: {
-      marginTop: 24,
+      marginBottom: 24,
       borderRadius: 40,
       height: 245,
       alignSelf: "stretch",

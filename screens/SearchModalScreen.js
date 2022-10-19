@@ -58,7 +58,7 @@ export const SearchModalScreen = ({ route, navigation }) => {
   const ResultItem = ({ item }) => (
     <TouchableOpacity
       onPress={() => {
-        onChangeText([item.name, item.iata_code]);
+        onChangeText([item.city, item.iata_code]);
         navigation.goBack();
       }}
       style={styles.resultContainer}

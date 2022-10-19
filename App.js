@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef  } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   useColorScheme,
+  Animated
 } from "react-native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
@@ -49,7 +50,24 @@ export default function App() {
       border: theme.backgroundColor,
     },
   };
-  const resultsHeaderTitle = "Hello";
+  const homeHeaderTitleFadeAnim = useRef(new Animated.Value(0)).current;
+  const resultsHeaderTitleFadeAnim = useRef(new Animated.Value(0)).current;
+
+  const fadeIn = (animRef) => {
+    Animated.timing(animRef, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true
+    }).start();
+  };
+
+  const fadeOut = (animRef) => {
+    Animated.timing(animRef, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true
+    }).start();
+  };
 
   const [fontsLoaded] = useFonts({
     "Poppins-Medium": require("./assets/fonts/Poppins-Medium.ttf"),
@@ -84,7 +102,8 @@ export default function App() {
             headerTitleStyle: {
               fontFamily: "Poppins-SemiBold",
               fontSize: 16,
-              color: theme.backgroundColor,
+              color: theme.primary.text.color,
+              opacity: homeHeaderTitleFadeAnim
             },
             tabBarItemStyle: {
               paddingTop: 16,
@@ -137,7 +156,16 @@ export default function App() {
             style: { height: 24 },
           }}
         >
-          <Tab.Screen name={homeName} component={HomeScreen} />
+          <Tab.Screen name={homeName}>
+            {(props) => (
+                <HomeScreen
+                  {...props}
+                  fadeIn={fadeIn}
+                  fadeOut={fadeOut}
+                  headerTitleFadeAnim={homeHeaderTitleFadeAnim}
+                />
+            )}
+          </Tab.Screen>
           <Tab.Screen name={savedName} component={HomeScreen} />
           <Tab.Screen name={profileName} component={HomeScreen} />
         </Tab.Navigator>
@@ -159,13 +187,11 @@ export default function App() {
               {(props) => (
                 <MainScreen
                   {...props}
-                  resultsHeaderTitle={resultsHeaderTitle}
                 />
               )}
             </Stack.Screen>
             <Stack.Screen
               name="Results"
-              component={ResultsScreen}
               options={{
                 headerBackImage: () => (
                   <ArrowLeft
@@ -184,9 +210,19 @@ export default function App() {
                   fontFamily: "Poppins-SemiBold",
                   fontSize: 16,
                   color: theme.primary.text.color,
+                  opacity: resultsHeaderTitleFadeAnim
                 },
               }}
-            />
+            >
+              {(props) => (
+                <ResultsScreen
+                  {...props}
+                  fadeIn={fadeIn}
+                  fadeOut={fadeOut}
+                  headerTitleFadeAnim={resultsHeaderTitleFadeAnim}
+                />
+            )}
+            </Stack.Screen>
           </Stack.Group>
           <Stack.Group screenOptions={{ presentation: "modal" }}>
             <Stack.Screen

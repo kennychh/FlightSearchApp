@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView, StyleSheet, Text, ScrollView, View, useColorScheme } from "react-native";
+import { SafeAreaView, StyleSheet, Text, ScrollView, View, useColorScheme, Animated } from "react-native";
 import SwitchSelector from "react-native-switch-selector";
 import { Button } from "../components/Button.js";
 import {STATUSBAR_HEIGHT} from "../constants/constants";
@@ -23,13 +23,26 @@ const DATA = [
   ];
   
 
-export const ResultsScreen = ({ route, navigation }) => {
+export const ResultsScreen = ({ route, navigation, fadeIn, fadeOut, headerTitleFadeAnim }) => {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? themes.dark :  themes.light;
   const styles = style(theme)
-  const { data, headerTitle } = route.params;
+  const { data, stickyHeaderTitle, headerTitle } = route.params;
   const insets = useSafeAreaInsets();
-  console.log(data)
+
+  const [pos, setPos] = useState(0);
+  const [isFadeIn, setIsFadeIn] = useState(false)
+
+  useEffect(()=> {
+    if(pos > 100 && !isFadeIn) {
+      fadeIn(headerTitleFadeAnim);
+      setIsFadeIn(true)
+    }
+    else if (pos <= 100 && isFadeIn) {
+      fadeOut(headerTitleFadeAnim);
+      setIsFadeIn(false)
+    }
+  }, [pos])
 
 
   const Item = ({ title }) => (
@@ -43,16 +56,15 @@ export const ResultsScreen = ({ route, navigation }) => {
   );
   
 
-
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: '',
+      headerTitle: stickyHeaderTitle,
     });
   }, [navigation, headerTitle]);
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={{paddingHorizontal: 24}}>
+    <View style={styles.container} >
+      <ScrollView style={{paddingHorizontal: 24}} scrollEventThrottle={16} onScroll={(e) => setPos(e.nativeEvent.contentOffset.y)}>
         <Text style={styles.title}>
             {headerTitle}
         </Text>
