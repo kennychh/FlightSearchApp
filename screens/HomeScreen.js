@@ -13,6 +13,7 @@ import SwitchSelector from "react-native-switch-selector";
 import { Button } from "../components/Button.js";
 import { STATUSBAR_HEIGHT, KEY } from "../constants/constants";
 import { themes } from "../constants/theme";
+import moment from "moment";
 
 export const HomeScreen = ({ navigation, fadeIn, fadeOut, headerTitleFadeAnim }) => {
   const colorScheme = useColorScheme();
@@ -43,6 +44,8 @@ export const HomeScreen = ({ navigation, fadeIn, fadeOut, headerTitleFadeAnim })
 
   const [pos, setPos] = useState(0);
   const [isFadeIn, setIsFadeIn] = useState(false)
+
+  const dateFormatted = `${moment(departureDate).format('ddd, MMM D')}${isRoundTrip ? ` - ${moment(returnDate).format('ddd, MMM D')}`: ''}`
 
   useEffect(()=> {
     if(pos > 50 && !isFadeIn) {
@@ -90,6 +93,7 @@ export const HomeScreen = ({ navigation, fadeIn, fadeOut, headerTitleFadeAnim })
             data: json,
             stickyHeaderTitle: `${originText[0]} - ${destinationText[0]}`,
             headerTitle: `${originText[0]} (${originText[1]}) - ${destinationText[0]} (${destinationText[1]})`,
+            date: dateFormatted,
           });
         }
       })
