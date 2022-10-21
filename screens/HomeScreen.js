@@ -15,7 +15,12 @@ import { STATUSBAR_HEIGHT, KEY } from "../constants/constants";
 import { themes } from "../constants/theme";
 import moment from "moment";
 
-export const HomeScreen = ({ navigation, fadeIn, fadeOut, headerTitleFadeAnim }) => {
+export const HomeScreen = ({
+  navigation,
+  fadeIn,
+  fadeOut,
+  headerTitleFadeAnim,
+}) => {
   const colorScheme = useColorScheme();
   const theme = colorScheme === "dark" ? themes.dark : themes.light;
   const [originText, onChangeOriginText] = React.useState([null, null]);
@@ -30,9 +35,10 @@ export const HomeScreen = ({ navigation, fadeIn, fadeOut, headerTitleFadeAnim })
   const [childAges, setChildAges] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [numAdults, setNumAdults] = useState(1);
   const [seatType, setSeatType] = useState("Economy");
+  const numTravellers = childAges[8] + numAdults;
   const travelOptionsText =
-    childAges[8] + numAdults > 1
-      ? `${childAges[8] + numAdults} Travellers, ${seatType}`
+    numTravellers > 1
+      ? `${numTravellers} Travellers, ${seatType}`
       : `1 Adult, ${seatType}`;
   const styles = style(theme);
 
@@ -43,20 +49,21 @@ export const HomeScreen = ({ navigation, fadeIn, fadeOut, headerTitleFadeAnim })
     (isRoundTrip && !returnDate);
 
   const [pos, setPos] = useState(0);
-  const [isFadeIn, setIsFadeIn] = useState(false)
+  const [isFadeIn, setIsFadeIn] = useState(false);
 
-  const dateFormatted = `${moment(departureDate).format('ddd, MMM D')}${isRoundTrip ? ` - ${moment(returnDate).format('ddd, MMM D')}`: ''}`
+  const dateFormatted = `${moment(departureDate).format("ddd, MMM D")}${
+    isRoundTrip ? ` - ${moment(returnDate).format("ddd, MMM D")}` : ""
+  }`;
 
-  useEffect(()=> {
-    if(pos > 50 && !isFadeIn) {
+  useEffect(() => {
+    if (pos > 50 && !isFadeIn) {
       fadeIn(headerTitleFadeAnim);
-      setIsFadeIn(true)
-    }
-    else if (pos <= 50 && isFadeIn) {
+      setIsFadeIn(true);
+    } else if (pos <= 50 && isFadeIn) {
       fadeOut(headerTitleFadeAnim);
-      setIsFadeIn(false)
+      setIsFadeIn(false);
     }
-  }, [pos])
+  }, [pos]);
 
   //TODO: add error when Only 1 child (aged 0-2) per adult is allowed
   const childAgeString = () => {
@@ -94,6 +101,8 @@ export const HomeScreen = ({ navigation, fadeIn, fadeOut, headerTitleFadeAnim })
             stickyHeaderTitle: `${originText[0]} - ${destinationText[0]}`,
             headerTitle: `${originText[0]} (${originText[1]}) - ${destinationText[0]} (${destinationText[1]})`,
             date: dateFormatted,
+            seatType: seatType,
+            numTravellers: numTravellers,
           });
         }
       })
@@ -102,7 +111,11 @@ export const HomeScreen = ({ navigation, fadeIn, fadeOut, headerTitleFadeAnim })
   };
   return (
     <View stlye={{ flex: 1 }}>
-      <ScrollView style={styles.container} scrollEventThrottle={16} onScroll={(e) => setPos(e.nativeEvent.contentOffset.y)}>
+      <ScrollView
+        style={styles.container}
+        scrollEventThrottle={16}
+        onScroll={(e) => setPos(e.nativeEvent.contentOffset.y)}
+      >
         <Text style={styles.title}>Flights</Text>
         <SafeAreaView style={styles.box}>
           <SwitchSelector

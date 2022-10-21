@@ -9,12 +9,15 @@ import {
   useColorScheme,
   Animated,
   FlatList,
+  Image,
 } from "react-native";
 import SwitchSelector from "react-native-switch-selector";
 import { Button } from "../components/Button.js";
 import { STATUSBAR_HEIGHT } from "../constants/constants";
 import { themes } from "../constants/theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { User } from "iconoir-react-native";
+import { Plane, Airlines } from "../assets/icons";
 import moment from "moment";
 
 const DATA = [
@@ -60,7 +63,14 @@ export const ResultsScreen = ({
   const colorScheme = useColorScheme();
   const theme = colorScheme === "dark" ? themes.dark : themes.light;
   const styles = style(theme);
-  const { data, stickyHeaderTitle, headerTitle, date } = route.params;
+  const {
+    data,
+    stickyHeaderTitle,
+    headerTitle,
+    date,
+    seatType,
+    numTravellers,
+  } = route.params;
 
   const [pos, setPos] = useState(0);
   const [isFadeIn, setIsFadeIn] = useState(false);
@@ -92,23 +102,8 @@ export const ResultsScreen = ({
     const arrival = leg.arrival;
     const timeDeltaInDays = leg.timeDeltaInDays;
     const segments = leg.segments;
-    let origins = [];
-    let destinations = [];
-    let carriers = [];
-    let departures = [];
-    let arrivals = [];
-    let durations = [];
-    let flightNumbers = [];
+    const carriers = leg.carriers;
 
-    segments.map((segment) => {
-      origins.push(segment.origin);
-      destinations.push(segment.destination);
-      carriers.push(segment.marketingCarrier);
-      departures.push(segment.departure);
-      arrivals.push(segment.arrival);
-      durations.push(segment.durationInMinutes);
-      flightNumbers.push(segment.flightNumber);
-    });
     return {
       origin,
       destination,
@@ -118,6 +113,7 @@ export const ResultsScreen = ({
       arrival,
       timeDeltaInDays,
       segments,
+      carriers,
     };
   };
 
@@ -143,10 +139,28 @@ export const ResultsScreen = ({
         arrival,
         timeDeltaInDays,
         segments,
+        carriers,
       } = parseLeg(leg);
+      const carrierLogoUrl = carriers.marketing[0].logoUrl;
+      const airline =
+        carriers.marketing.length > 1
+          ? null
+          : carrierLogoUrl
+              .replace("https://logos.skyscnr.com/images/airlines/favicon/", "")
+              .replace(".png", "");
+      const airlineLogoUrl = `https://res.cloudinary.com/wego/f_auto,fl_lossy,h_80,w_80,q_auto/flights/airlines_square/${airline}.png`;
+      const airlineLogo = (
+        airline ? <Image
+        style={styles.logo}
+        source={{
+          uri: airlineLogoUrl,
+        }}
+      /> : <Airlines fill={theme.icon.inactive.color}/>
+      );
       const connectingFlights = segments.map((segment, index) => {
         if (
           index < segments.length - 1 &&
+          index > 0 &&
           segment.destination.flightPlaceId !==
             segments[index + 1].origin.flightPlaceId
         ) {
@@ -163,36 +177,163 @@ export const ResultsScreen = ({
         if (index < connectingFlights.length - 2) {
           seperator = ", ";
         }
-        return <Text style={styles.subtitle}>{`${item}${seperator}`}</Text>;
+        return (
+          <Text style={styles.resultSubtitle}>{`${item}${seperator}`}</Text>
+        );
       });
 
       const departureTime = moment(departure).format("LT");
       const arrivalTime = moment(arrival).format("LT");
-      const stopsText = `${
-        connectingFlights.length - 1 == 0
-          ? "Direct"
-          : `${connectingFlights.length - 1} stop${
+      const stopsText = (
+        <View>
+          {connectingFlights.length - 1 == 0 ? (
+            <Text
+              style={[
+                styles.resultSubtitle,
+                { color: theme.success.textColor },
+              ]}
+            >
+              Direct
+            </Text>
+          ) : (
+            <Text
+              style={[styles.resultSubtitle, { color: theme.error.textColor }]}
+            >{`${connectingFlights.length - 1} stop${
               connectingFlights.length > 2 ? "s" : ""
-            } `
-      }`;
+            } `}</Text>
+          )}
+        </View>
+      );
+
+      const stopDots = () => {
+        const dots = connectingFlights.map((connecttion, index) => {
+          if (connectingFlights.length - 1 == 0) {
+            return;
+          }
+          if (index < connectingFlights.length - 1) {
+            return (
+              <View
+                style={{
+                  width: 16,
+                  height: 16,
+                  borderRadius: 16,
+                  backgroundColor: theme.onBackgroundColor,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "row",
+                  marginLeft: index == 0 ? 0 : 8,
+                }}
+              >
+                <View
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 8,
+                    backgroundColor: theme.error.textColor,
+                  }}
+                />
+              </View>
+            );
+          }
+        });
+        return (
+          <View
+            style={{
+              flexDirection: "row",
+              position: "absolute",
+              justifyContent: "center",
+              left: 0,
+              right: 0,
+              zIndex: 1,
+            }}
+          >
+            {dots}
+          </View>
+        );
+      };
 
       return (
-        <View>
-          <Text style={styles.subtitle}>{departureTime}</Text>
+        <View
+          style={{
+            paddingBottom: 24,
+            alignSelf: "stretch",
+            alignContent: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <View style={{ flexDirection: "row" }}>
-            <Text style={styles.title}>{origin.id}</Text>
-            <Text style={styles.subtitle}>{stopsText}</Text>
-            {connectingFlightsItem}
-            <Text style={styles.title}>{destination.id}</Text>
+            {airlineLogo}
+            <View
+              style={{
+                alignSelf: "center",
+                alignItems: "center",
+                left: 0,
+                right: 0,
+                position: "absolute",
+              }}
+            >
+              <Text style={styles.resultSubtitle}>
+                {minutes_to_hhmm(durationInMinutes)}
+              </Text>
+            </View>
           </View>
-          <Text style={styles.subtitle}>{arrivalTime}</Text>
-          <Text style={styles.subtitle}>
-            {minutes_to_hhmm(durationInMinutes)}
-          </Text>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginVertical: 8,
+              alignItems: "center",
+            }}
+          >
+            {stopDots()}
+            <View>
+              <Text style={styles.resultTitle}>{origin.id}</Text>
+            </View>
+            <View style={styles.line} />
+            <Plane fill={theme.icon.inactive.color} style={styles.plane} />
+            <View>
+              <Text style={[styles.resultTitle, { alignSelf: "flex-end" }]}>
+                {destination.id}
+              </Text>
+            </View>
+          </View>
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <Text style={styles.resultSubtitle}>{departureTime}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                position: "absolute",
+                justifyContent: "center",
+                left: 0,
+                right: 0,
+              }}
+            >
+              {stopsText}
+              {connectingFlights.length <= 3 && connectingFlightsItem}
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.resultSubtitle}>{arrivalTime}</Text>
+              {timeDeltaInDays > 0 && (
+                <Text
+                  style={[
+                    styles.resultSubtitle,
+                    { fontSize: 10, lineHeight: 18 },
+                  ]}
+                >{`+${timeDeltaInDays}`}</Text>
+              )}
+            </View>
+          </View>
         </View>
       );
     });
-    return <View style={styles.item}>{flightInfo}</View>;
+    return (
+      <View style={styles.resultContainer}>
+        {flightInfo}
+        <Text style={styles.resultTitle}>{price.formatted}</Text>
+      </View>
+    );
   };
 
   const renderItem = ({ item }) => <Item item={item} />;
@@ -212,7 +353,18 @@ export const ResultsScreen = ({
       >
         <Text style={styles.title}>{headerTitle}</Text>
         <Text style={styles.subtitle}>{date}</Text>
-        <Text style={styles.subtitle}>Economy</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={styles.subtitle}>{numTravellers}</Text>
+          <User
+            color={theme.secondary.text.color}
+            style={{ marginTop: 8, marginLeft: 4 }}
+            width={16}
+            height={16}
+            strokeWidth={3}
+          />
+          <Text style={[styles.subtitle, { marginHorizontal: 8 }]}>·</Text>
+          <Text style={styles.subtitle}>{seatType}</Text>
+        </View>
         <SwitchSelector
           initial={0}
           onPress={(value) => {
@@ -239,6 +391,7 @@ export const ResultsScreen = ({
           style={styles.switcher}
         />
         <FlatList
+          nestedScrollEnabled
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
           data={buckets[bucket].items}
@@ -278,11 +431,40 @@ const style = (theme) =>
       marginTop: 8,
       color: theme.secondary.text.color,
     },
+    resultTitle: {
+      fontFamily: "Poppins-SemiBold",
+      fontSize: 16,
+      fontWeight: "700",
+      color: theme.primary.text.color,
+    },
+    resultSubtitle: {
+      fontFamily: "Poppins-Medium",
+      fontSize: 14,
+      color: theme.secondary.text.color,
+    },
     resultContainer: {
       marginTop: 24,
       borderRadius: 40,
-      height: 245,
+      padding: 24,
       alignSelf: "stretch",
       backgroundColor: theme.onBackgroundColor,
+      justifyContent: "space-between",
+      alignItems: "center",
+      alignContent: "center",
+    },
+    line: {
+      height: 2,
+      backgroundColor: theme.secondary.button.color,
+      flex: 1,
+      marginLeft: 24,
+      marginRight: 4,
+      borderRadius: 8,
+    },
+    plane: {
+      marginRight: 24,
+    },
+    logo: {
+      width: 20,
+      height: 20,
     },
   });
