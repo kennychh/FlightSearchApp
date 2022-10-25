@@ -15,6 +15,7 @@ import {
   HomeSimpleDoor,
   BookmarkEmpty,
   ProfileCircled,
+  ShoppingBag
 } from "iconoir-react-native";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -26,7 +27,7 @@ import {
   TravelOptionsModalScreen,
 } from "./screens";
 import { createStackNavigator } from "@react-navigation/stack";
-import { STATUSBAR_HEIGHT } from "./constants/constants";
+import { Luggage } from "./assets/icons";
 import { themes } from "./constants/theme";
 import "react-native-gesture-handler";
 
@@ -37,7 +38,8 @@ const Stack = createStackNavigator();
 
 const homeName = "Home";
 const savedName = "Saved";
-const profileName = "Profile";
+const tripsName = "Trips";
+const profileName = 'Profile';
 
 export default function App() {
   const colorScheme = useColorScheme();
@@ -124,7 +126,6 @@ export default function App() {
                     width={size}
                     height={size}
                     strokeWidth={2}
-                    style={{ marginLeft: 48 }}
                   />
                 );
               } else if (rn === savedName) {
@@ -136,14 +137,23 @@ export default function App() {
                     strokeWidth={2}
                   />
                 );
-              } else if (rn === profileName) {
+              } else if (rn === tripsName) {
+                icon = (
+                  <ShoppingBag
+                    color={color}
+                    width={size}
+                    height={size}
+                    strokeWidth={2}
+                  />
+                );
+              }
+              else if (rn === profileName) {
                 icon = (
                   <ProfileCircled
                     color={color}
                     width={size}
                     height={size}
                     strokeWidth={2}
-                    style={{ marginRight: 48 }}
                   />
                 );
               }
@@ -166,6 +176,7 @@ export default function App() {
                 />
             )}
           </Tab.Screen>
+          <Tab.Screen name={tripsName} component={HomeScreen} />
           <Tab.Screen name={savedName} component={HomeScreen} />
           <Tab.Screen name={profileName} component={HomeScreen} />
         </Tab.Navigator>

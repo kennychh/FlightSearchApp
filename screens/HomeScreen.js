@@ -12,6 +12,10 @@ import {
 import SwitchSelector from "react-native-switch-selector";
 import { Button } from "../components/Button.js";
 import { STATUSBAR_HEIGHT, KEY } from "../constants/constants";
+import {
+  MoreHoriz
+} from "iconoir-react-native";
+import { DisplayIcon } from "../components/DisplayIcon.js";
 import { themes } from "../constants/theme";
 import moment from "moment";
 
