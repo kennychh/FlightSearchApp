@@ -99,6 +99,8 @@ export const HomeScreen = ({
           console.log("API Request Error: ", json);
         } else if (Array.isArray(json.data) && json.data.length == 0) {
           console.log("API Request Error: ", json);
+        } else if (json.data == "Data not found, please try again or contact with us hello@goflightlabs.com") {
+          console.log("Data not found, please try again or contact with us hello@goflightlabs.com", json);
         } else {
           navigation.navigate("Results", {
             data: json,
@@ -393,11 +395,11 @@ const style = (theme) =>
     box: {
       alignSelf: "stretch",
       backgroundColor: theme.onBackgroundColor,
-      borderRadius: 40,
+      borderRadius: 32,
     },
     resultContainer: {
       marginBottom: 24,
-      borderRadius: 40,
+      borderRadius: 32,
       height: 245,
       alignSelf: "stretch",
       backgroundColor: theme.onBackgroundColor,

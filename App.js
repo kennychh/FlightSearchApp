@@ -177,7 +177,7 @@ export default function App() {
             )}
           </Tab.Screen>
           <Tab.Screen name={tripsName} component={HomeScreen} />
-          <Tab.Screen name={savedName} component={HomeScreen} />
+          {/* <Tab.Screen name={savedName} component={HomeScreen} /> */}
           <Tab.Screen name={profileName} component={HomeScreen} />
         </Tab.Navigator>
         <StatusBar style="auto" />

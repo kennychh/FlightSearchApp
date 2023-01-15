@@ -74,12 +74,9 @@ export const ResultsScreen = ({
 
   const [pos, setPos] = useState(0);
   const [isFadeIn, setIsFadeIn] = useState(false);
-
+  console.log(data);
   const parseData = () => {
     const buckets = data.data.buckets;
-    const best = buckets[0].items;
-    const fastest = buckets[1].items;
-    const cheapest = buckets[2].items;
     return buckets;
   };
   const buckets = parseData();
@@ -444,7 +441,7 @@ const style = (theme) =>
     },
     resultContainer: {
       marginTop: 24,
-      borderRadius: 40,
+      borderRadius: 32,
       padding: 24,
       alignSelf: "stretch",
       backgroundColor: theme.onBackgroundColor,

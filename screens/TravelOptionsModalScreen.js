@@ -331,8 +331,8 @@ const style = (theme) =>
       alignSelf: "stretch",
       height: "100%",
       backgroundColor: theme.onBackgroundColor,
-      borderTopRightRadius: 40,
-      borderTopLeftRadius: 40,
+      borderTopRightRadius: 32,
+      borderTopLeftRadius: 32,
     },
     scrollView: {
       paddingHorizontal: 24,
